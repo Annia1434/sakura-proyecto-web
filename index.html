@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Mi Persona Favorita ❤️</title>
+  <style>
+    :root {
+      --primary-pink: #ffb7c5;
+      --accent-magenta: #e05297;
+      --soft-white: #fff5f7;
+      --deep-purple: #2a1b3d;
+      --glass-bg: rgba(255, 245, 247, 0.88);
+      --pixel-shadow: 4px 4px 0px #2a1b3d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--deep-purple);
+      background-color: #2a1b3d;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #bg-video {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      z-index: 0;
+      pointer-events: none;
+      background: #2a1b3d;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      filter: brightness(0.85) saturate(1.05);
+    }
+
+    #petals-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .main-container {
+      max-width: 750px;
+      margin: 0 auto;
+      height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 20;
+    }
+
+    header {
+      text-align: center;
+      background: var(--glass-bg);
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 3px solid var(--deep-purple);
+      box-shadow: var(--pixel-shadow);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    h1 {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1.1rem;
+      color: var(--accent-magenta);
+      margin-bottom: 2px;
+      text-shadow: 2px 2px 0px #fff;
+    }
+
+    .book-page {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .book-page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card {
+      background: var(--glass-bg);
+      border-radius: 20px;
+      border: 3px solid var(--deep-purple);
+      padding: 18px;
+      box-shadow: var(--pixel-shadow);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .card-title {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.9rem;
+      color: var(--accent-magenta);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .envelope-wrapper {
+      cursor: pointer;
+      text-align: center;
+      background: #ffdae0;
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px dashed var(--accent-magenta);
+      transition: transform 0.2s;
+    }
+
+    .envelope-wrapper:hover {
+      transform: scale(1.02);
+    }
+
+    .letter-content {
+      display: none;
+      margin-top: 15px;
+      text-align: left;
+      line-height: 1.7;
+      font-size: 0.98rem;
+      background: #fff;
+      padding: 16px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--primary-pink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      color: #3f2145;
+    }
+
+    .letter-content p {
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .polaroid-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .polaroid {
+      background: white;
+      padding: 8px 8px 12px 8px;
+      border: 2px solid var(--deep-purple);
+      box-shadow: var(--pixel-shadow);
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .polaroid:nth-child(1) { transform: rotate(-2deg); }
+    .polaroid:nth-child(2) { transform: rotate(2deg); }
+    .polaroid:nth-child(3) { transform: rotate(1deg); }
+    .polaroid:nth-child(4) { transform: rotate(-3deg); }
+
+    .polaroid:hover {
+      transform: scale(1.05) rotate(0deg);
+      z-index: 5;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 95px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .polaroid p {
+      font-size: 0.78rem;
+      margin-top: 5px;
+      font-weight: 600;
+    }
+
+    .her-photos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .her-card {
+      background: #fff;
+      padding: 10px;
+      border-radius: 18px;
+      border: 3px solid var(--accent-magenta);
+      box-shadow: var(--pixel-shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s;
+      overflow: hidden;
+    }
+
+    .her-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .her-card img {
+      width: 100%;
+      height: 145px;
+      object-fit: cover;
+      object-position: center center;
+      border-radius: 12px;
+      border: 2px solid var(--primary-pink);
+      display: block;
+    }
+
+    .first-date-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .date-photo {
+      background: #fff;
+      border: 3px solid var(--accent-magenta);
+      border-radius: 18px;
+      padding: 10px;
+      box-shadow: var(--pixel-shadow);
+      text-align: center;
+    }
+
+    .date-photo img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      object-position: center center;
+      border-radius: 12px;
+      display: block;
+      border: 2px solid var(--primary-pink);
+    }
+
+    .date-photo p {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--deep-purple);
+    }
+
+    .song-info {
+      margin-top: 6px;
+      background: #fff0f4;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--primary-pink);
+    }
+
+    .song-title {
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: var(--accent-magenta);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-play {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.65rem;
+      padding: 4px 6px;
+      background: var(--accent-magenta);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    .btn-play:hover {
+      background: #b83270;
+    }
+
+    .checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .checklist input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-magenta);
+      cursor: pointer;
+    }
+
+    .counter-box {
+      text-align: center;
+    }
+
+    .counter-display {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 2.2rem;
+      color: var(--accent-magenta);
+      margin: 12px 0;
+    }
+
+    .btn-pixel {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.75rem;
+      padding: 8px 14px;
+      background: var(--primary-pink);
+      color: var(--deep-purple);
+      border: 2px solid var(--deep-purple);
+      box-shadow: 2px 2px 0px var(--deep-purple);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.1s ease;
+      font-weight: bold;
+    }
+
+    .btn-pixel:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--deep-purple);
+    }
+
+    .btn-pixel:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Spotify Style Lyrics Page 6 */
+    .spotify-lyrics-container {
+      background: rgba(18, 12, 28, 0.92);
+      border-radius: 16px;
+      padding: 16px;
+      border: 2px solid var(--accent-magenta);
+      color: #fff;
+    }
+
+    .spotify-lyrics-box {
+      height: 220px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 40px 10px;
+      text-align: center;
+    }
+
+    .spotify-lyrics-box::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .spotify-lyrics-box::-webkit-scrollbar-thumb {
+      background: var(--accent-magenta);
+      border-radius: 4px;
+    }
+
+    .lyric-line {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.35);
+      transition: color 0.12s ease, text-shadow 0.12s ease;
+      cursor: pointer;
+      line-height: 1.4;
+      will-change: auto;
+    }
+
+    .lyric-line:hover {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .lyric-line.active-lyric {
+      font-size: 1.08rem;
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 14px rgba(224, 82, 151, 0.7);
+      will-change: auto;
+    }
+
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--glass-bg);
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 3px solid var(--deep-purple);
+      box-shadow: var(--pixel-shadow);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .page-indicator {
+      font-family: "Courier New", Courier, monospace;
+      font-weight: bold;
+      font-size: 0.8rem;
+      color: var(--accent-magenta);
+    }
+
+    .click-spark {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.5rem;
+      animation: floatUp 1s ease-out forwards;
+      z-index: 1000;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+      100% { opacity: 0; transform: translate(-50%, -100px) scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <video id="bg-video" autoplay loop muted playsinline preload="metadata" aria-hidden="true">
+    <source src="unsaid_silence_pindown.io_1789782012.mp4" type="video/mp4">
+  </video>
+
+  <canvas id="petals-canvas"></canvas>
+
+  <div class="main-container">
+    <header>
+      <h1>NUESTRO HOGAR 🪷🌸</h1>
+      <p style="font-size: 0.8rem;">Un pequeño detalle hecho con todo mi amor</p>
+    </header>
+
+    <div class="book-page active" id="page-1">
+      <section class="card">
+        <div class="card-title">✉️ Una carta para ti (Página 1)</div>
+        <div class="envelope-wrapper" onclick="toggleLetter()">
+          <p id="envelope-text">👉 Haz clic aquí para abrir el sobre 👈</p>
+          <div id="letter" class="letter-content">
+            <audio id="letter-song" src="cancion4.mp3"></audio>
+            <p>¡Hola, mi amor! ❤️</p><br>
+            <p>Eres la persona más especial en mi vida. En mi mundo eres mi todo. Fer, te adoro tanto, ¿sabes?..</p><br>
+            <p>Por eso te hago esto con mucho esfuerzo y amor, espero te guste cariño.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="book-page" id="page-2">
+      <section class="card">
+        <div class="card-title">📸 Nuestros Recuerdos Juntos (Página 2)</div>
+        <div class="polaroid-grid">
+          <div class="polaroid">
+            <img src="foto1.jpg" alt="Recuerdo 1" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400';">
+            <p>Nosotras antez</p>
+          </div>
+          <div class="polaroid">
+            <img src="foto2.jpg" alt="Recuerdo 2" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=400';">
+            <p>nosotras ahora JSAKSA</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="book-page" id="page-3">
+      <section class="card">
+        <div class="card-title"> Canciones que me recuerdan a ti (Página 3)</div>
+        <div class="her-photos-grid">
+          <div class="her-card">
+            <img src="foto3.jpg" alt="Foto 3" style="object-position: center 25%;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';">
+            <div class="song-info">
+              <div class="song-title">🎵 Canción 1</div>
+              <audio id="song-1" src="cancion1.mp3"></audio>
+              <button class="btn-play" onclick="togglePlay('song-1', this)">▶ Reproducir</button>
+            </div>
+          </div>
+
+          <div class="her-card">
+            <img src="foto4.jpg" alt="Foto 4" style="object-position: center 20%;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400';">
+            <div class="song-info">
+              <div class="song-title">🎵 Canción 2</div>
+              <audio id="song-2" src="cancion2.mp3"></audio>
+              <button class="btn-play" onclick="togglePlay('song-2', this)">▶ Reproducir</button>
+            </div>
+          </div>
+
+          <div class="her-card">
+            <img src="foto5.jpg" alt="Foto 5" style="object-position: center 18%;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400';">
+            <div class="song-info">
+              <div class="song-title">🎵 Canción 3</div>
+              <audio id="song-3" src="cancion3.mp3"></audio>
+              <button class="btn-play" onclick="togglePlay('song-3', this)">▶ Reproducir</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="book-page" id="page-4">
+      <section class="card">
+        <div class="card-title">✨ Citas por Cumplir (Página 4)</div>
+        <ul class="checklist">
+          <li><input type="checkbox" checked> Ir por unos helados juntos</li>
+          <li><input type="checkbox">ver peliculas juntitas arrunchadita</l i>
+          <li><input type="checkbox"> comer pizza 🍕</li>
+          <li><input type="checkbox"> ir al museo de arte</li>
+          <li><input type="checkbox"> comer pasto</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="book-page" id="page-5">
+      <section class="card counter-box">
+        <div class="card-title" style="justify-content: center;">💋 Medidor de Besitos (Página 5)</div>
+
+        <audio id="meow-sound" src="miau.mp3" preload="auto"></audio>
+
+        <div class="counter-display" id="kiss-count">0</div>
+        <button class="btn-pixel" onclick="addKiss(event)">¡Enviar un Besito! ❤️</button>
+      </section>
+    </div>
+
+    <div class="book-page" id="page-6">
+      <section class="card spotify-lyrics-container">
+        <div class="card-title" style="color: #fff; justify-content: space-between;">
+          <span>🎶 Canción 5</span>
+          <button class="btn-play" id="song-5-play-btn" style="width: auto; padding: 6px 14px; font-size: 0.75rem;" onclick="togglePlay('song-5', this)">▶ Reproducir Canción 5</button>
+        </div>
+
+        <audio id="song-5" src="cancion5.mp3" preload="auto"></audio>
+
+        <div class="spotify-lyrics-box" id="lyrics-box">
+          <div class="lyric-line" data-time="26">Eres</div>
+          <div class="lyric-line" data-time="30">Lo que más quiero en este mundo, eso eres</div>
+          <div class="lyric-line" data-time="35">Mi pensamiento más profundo también eres</div>
+          <div class="lyric-line" data-time="42">Tan solo dime lo que hago, aquí me tienes</div>
+          <div class="lyric-line" data-time="49">Eres</div>
+          <div class="lyric-line" data-time="56">Cuando despierto, lo primero, eso eres</div>
+          <div class="lyric-line" data-time="64">Lo que a mi vida le hace falta si no vienes</div>
+          <div class="lyric-line" data-time="71">Lo único precioso que en mi mente habita hoy</div>
+          <div class="lyric-line" data-time="78">¿Qué más puedo decirte?</div>
+          <div class="lyric-line" data-time="80">Tal vez puedo mentirte sin razón</div>
+          <div class="lyric-line" data-time="82">Pero lo que hoy siento</div>
+          <div class="lyric-line" data-time="85">Es que sin ti estoy muerto, pues eres</div>
+          <div class="lyric-line" data-time="91">Lo que más quiero en este mundo, eso eres</div>
+          <div class="lyric-line" data-time="120">Eres</div>
+          <div class="lyric-line" data-time="123">El tiempo que comparto, eso eres</div>
+          <div class="lyric-line" data-time="127">Lo que la gente promete cuando se quiere</div>
+          <div class="lyric-line" data-time="132">Mi salvación, mi esperanza y mi fe</div>
+          <div class="lyric-line" data-time="136">Soy</div>
+          <div class="lyric-line" data-time="140">El que quererte quiere como nadie, soy</div>
+          <div class="lyric-line" data-time="146">El que te llevaría al sustento día a día, día a día</div>
+          <div class="lyric-line" data-time="152">El que por ti daría la vida, ese soy</div>
+          <div class="lyric-line" data-time="157">Aquí estoy a tu lado</div>
+          <div class="lyric-line" data-time="162">Y espero aquí sentado</div>
+          <div class="lyric-line" data-time="166">Hasta el final</div>
+          <div class="lyric-line" data-time="172">No te has imaginado</div>
+          <div class="lyric-line" data-time="177">Lo que por ti he esperado</div>
+          <div class="lyric-line" data-time="183">Pues eres</div>
+          <div class="lyric-line" data-time="189">Lo que yo amo en este mundo, eso eres</div>
+          <div class="lyric-line" data-time="195">Cada minuto en lo que pienso, eso eres</div>
+          <div class="lyric-line" data-time="201">Lo que más cuido en este mundo, eso eres</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn-pixel" id="prev-btn" onclick="changePage(-1)" disabled>◀ Anterior</button>
+      <span class="page-indicator" id="page-indicator">Página 1 de 6</span>
+      <button class="btn-pixel" id="next-btn" onclick="changePage(1)">Siguiente ▶</button>
+    </div>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const totalPages = 6;
+
+    function changePage(direction) {
+      const newPage = currentPage + direction;
+      if (newPage >= 1 && newPage <= totalPages) {
+        pauseAllSongs();
+
+        document.getElementById(`page-${currentPage}`).classList.remove('active');
+        currentPage = newPage;
+        document.getElementById(`page-${currentPage}`).classList.add('active');
+
+        document.getElementById('page-indicator').innerText = `Página ${currentPage} de ${totalPages}`;
+        document.getElementById('prev-btn').disabled = (currentPage === 1);
+        document.getElementById('next-btn').disabled = (currentPage === totalPages);
+      }
+    }
+
+    function togglePlay(songId, btn) {
+      const audioElement = document.getElementById(songId);
+      if (!audioElement || !btn) return;
+
+      if (audioElement.paused) {
+        pauseAllSongs();
+        const playPromise = audioElement.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            console.log('No se pudo iniciar la reproducción del audio.');
+          });
+        }
+        btn.innerText = '⏸ Pausar';
+      } else {
+        audioElement.pause();
+        btn.innerText = songId === 'song-5' ? '▶ Reproducir Canción 5' : '▶ Reproducir';
+      }
+
+      audioElement.onended = () => {
+        btn.innerText = songId === 'song-5' ? '▶ Reproducir Canción 5' : '▶ Reproducir';
+      };
+    }
+
+    function pauseAllSongs() {
+      const songs = [
+        document.getElementById('letter-song'),
+        document.getElementById('song-1'),
+        document.getElementById('song-2'),
+        document.getElementById('song-3'),
+        document.getElementById('song-5')
+      ];
+
+      songs.forEach(song => {
+        if (song) {
+          song.pause();
+        }
+      });
+
+      const buttons = document.querySelectorAll('.btn-play');
+      buttons.forEach(b => {
+        if (b.id === 'song-5-play-btn') {
+          b.innerText = '▶ Reproducir Canción 5';
+        } else {
+          b.innerText = '▶ Reproducir';
+        }
+      });
+    }
+
+    const song5Audio = document.getElementById('song-5');
+    const lyricLines = document.querySelectorAll('.lyric-line');
+    const lyricsBox = document.getElementById('lyrics-box');
+    const lyricEntries = Array.from(lyricLines).map((line) => ({
+      el: line,
+      start: Number(line.dataset.time || 0)
+    }));
+    let activeLyricIndex = -1;
+    let lastLyricCheck = 0;
+
+    function highlightLyric(currentTime) {
+      if (!lyricEntries.length || !lyricsBox) return;
+
+      const startGlowAt = 26;
+
+      if (currentTime < startGlowAt) {
+        if (activeLyricIndex !== -1) {
+          lyricLines.forEach(line => line.classList.remove('active-lyric'));
+          activeLyricIndex = -1;
+        }
+        return;
+      }
+
+      let nextIndex = -1;
+      for (let i = 0; i < lyricEntries.length; i++) {
+        const entry = lyricEntries[i];
+        const nextStart = lyricEntries[i + 1] ? lyricEntries[i + 1].start : entry.start + 9;
+
+        if (currentTime >= entry.start && currentTime < nextStart) {
+          nextIndex = i;
+          break;
+        }
+      }
+
+      if (nextIndex === activeLyricIndex) return;
+
+      activeLyricIndex = nextIndex;
+      lyricLines.forEach((line, index) => {
+        line.classList.toggle('active-lyric', index === nextIndex);
+      });
+
+      if (nextIndex >= 0) {
+        const activeLine = lyricEntries[nextIndex].el;
+        const boxRect = lyricsBox.getBoundingClientRect();
+        const lineRect = activeLine.getBoundingClientRect();
+        const isOutOfView = lineRect.top < boxRect.top || lineRect.bottom > boxRect.bottom;
+
+        if (isOutOfView) {
+          const offset = lineRect.top - boxRect.top - boxRect.height * 0.35;
+          lyricsBox.scrollTop += offset;
+        }
+      }
+    }
+
+    function updateLyricHighlight() {
+      const now = performance.now();
+      if (now - lastLyricCheck < 120) return;
+      lastLyricCheck = now;
+      if (song5Audio) {
+        highlightLyric(song5Audio.currentTime);
+      }
+    }
+
+    if (song5Audio) {
+      song5Audio.addEventListener('loadedmetadata', () => {
+        highlightLyric(26);
+      });
+
+      song5Audio.addEventListener('play', () => {
+        highlightLyric(song5Audio.currentTime);
+      });
+
+      song5Audio.addEventListener('timeupdate', updateLyricHighlight);
+    }
+
+    lyricLines.forEach(line => {
+      line.addEventListener('click', () => {
+        const time = parseFloat(line.getAttribute('data-time'));
+        if (song5Audio) {
+          song5Audio.currentTime = time;
+          if (song5Audio.paused) {
+            togglePlay('song-5', document.getElementById('song-5-play-btn'));
+          } else {
+            highlightLyric(time);
+          }
+        }
+      });
+    });
+
+    const canvas = document.getElementById('petals-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    if (!canvas || !ctx) {
+      console.warn('Canvas no disponible; se omite la animación de pétalos.');
+    } else {
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const colors = ['#ffb7c5', '#e05297', '#ffffff', '#ffe4e1'];
+      const petals = Array.from({ length: 6 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        size: Math.random() * 5 + 2.5,
+        speedY: Math.random() * 0.7 + 0.32,
+        speedX: Math.random() * 0.4 - 0.2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        angle: Math.random() * 360
+      }));
+
+      function drawPetals() {
+        ctx.clearRect(0, 0, width, height);
+        petals.forEach(p => {
+          ctx.save();
+          ctx.beginPath();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.angle += 0.8;
+
+          if (p.y > height + 10) {
+            p.y = -10;
+            p.x = Math.random() * width;
+          }
+        });
+        requestAnimationFrame(drawPetals);
+      }
+      drawPetals();
+    }
+
+
+    function toggleLetter() {
+      const letter = document.getElementById('letter');
+      const text = document.getElementById('envelope-text');
+      const letterSong = document.getElementById('letter-song');
+
+      if (!letter || !text) return;
+
+      if (letter.style.display === 'block') {
+        letter.style.display = 'none';
+        text.innerText = '👉 Haz clic aquí para abrir el sobre 👈';
+        if (letterSong) {
+          letterSong.pause();
+          letterSong.currentTime = 0;
+        }
+      } else {
+        pauseAllSongs();
+        letter.style.display = 'block';
+        text.innerText = '✉️ ¡Carta Abierta!';
+        if (letterSong) {
+          const playPromise = letterSong.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {
+              console.log('No se pudo iniciar la carta con audio.');
+            });
+          }
+        }
+      }
+    }
+
+    let kisses = 0;
+    function addKiss(e) {
+      kisses++;
+      const counter = document.getElementById('kiss-count');
+      if (counter) counter.innerText = kisses;
+      if (e && typeof e.clientX === 'number' && typeof e.clientY === 'number') {
+        createSpark(e.clientX, e.clientY, '💖');
+      }
+
+      const meow = document.getElementById('meow-sound');
+      if (meow) {
+        meow.currentTime = 0;
+        const playPromise = meow.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            console.log('No se pudo reproducir el sonido del beso.');
+          });
+        }
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target || !e.target.closest) return;
+      if (!e.target.closest('button') && !e.target.closest('input')) {
+        const items = ['🪷', '🌸', '✨', '💕', '🐱'];
+        const randomItem = items[Math.floor(Math.random() * items.length)];
+        createSpark(e.clientX, e.clientY, randomItem);
+      }
+    });
+
+    function createSpark(x, y, symbol) {
+      if (typeof x !== 'number' || typeof y !== 'number') return;
+      const spark = document.createElement('div');
+      spark.className = 'click-spark';
+      spark.innerText = symbol;
+      spark.style.left = `${x}px`;
+      spark.style.top = `${y}px`;
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 1000);
+    }
+  </script>
+</body>
+</html>
